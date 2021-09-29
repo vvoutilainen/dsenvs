@@ -1,6 +1,6 @@
 # `conda` data science environments
 
-**By Ville Voutilainen/NoobQuant, updated 2021-07-21.**
+**By Ville Voutilainen/NoobQuant, updated 2021-09-29.**
 
 **MIT license, usage at one's own risk!**
 
@@ -182,6 +182,7 @@ Then use R Studio as per usual.
 
 Troubleshoot:
  - If opened R files suddenly appear empty in RStudio, one needs to reopen the file with UTF-8 encoding. See [this](https://stackoverflow.com/a/45034170/7037299).
+ - If you have multiple environments with an R installation (*env1* and *env2*), RStudio in *env2* might initially point to R.exe in *env1*. To correct this, simply change the R version in RStudio under *Tools* -> *Global options* -> *General* -> *R version*.
 
 ### Using Python and R in VSCode
 
@@ -189,7 +190,7 @@ VSCode is one of the best overall IDE's for data science. Thanks to its many plu
 
 **Python files**
 
-To begin with, install [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) plugin for VSCode. Next, make sure the desired custom environment (e.g. `dev2021`) Python interpreter is selected in VSCode (bottom-left). Then from the *.py* file, right-click and choose *Run Python file in terminal*. This creates a new Python terminal and executes the file. One can also *Run selection/line in Python terminal* to run a specific section. To exit,  type `quit()` to close the Python instance. One can also run file/section of it in interactive terminal, in which case VSCode launches Jupyter to create an interactive window. I would not recommend this too much, however. Rather use notebooks for interactive computing.
+To begin with, install [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) plugin for VSCode. Next, make sure the desired custom environment (e.g. `dev2021`) Python interpreter is selected in VSCode (bottom-left). Then from the *.py* file, right-click and choose *Run Python file in terminal*. This creates a new Python terminal and executes the file. One can also *Run selection/line in Python terminal* to run a specific section. To exit,  type `quit()` to close the Python instance. One can also run file/section of it in interactive terminal, in which case VSCode launches Jupyter to create an interactive window. I would not recommend this, however. Rather, use notebooks for interactive computing.
 
 **Python notebooks**
 
