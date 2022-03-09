@@ -97,24 +97,37 @@ conda install mamba
 
 Now we can install a custom `conda` environment. There are two tested *NoobQuant* `conda` environments. One can also both, but make sure to complete the installation fully for each environment before starting with the other.
 
- - `dev2018`: Year 2018 version with Python 3.6.10 and R 3.6.0
- - `dev2021`: Year 2021 version with Python 3.8.5 and R 3.6.3
+ - `dev2018`: Python 3.6.10 and R 3.6.0
+ - `dev2021`: Python 3.8.5 and R 3.6.3
+ - `dev2021b`: Python 3.9.7 and R 3.6.3
 
 To build either one of the environments, run commands as detailed in subsections.
 
-#### dev_2018: Year 2018 version with Python 3.6.10 and R 3.6.0
+#### dev_2018: Python 3.6.10 and R 3.6.0
 
 ```
 mamba create --name dev2018 anaconda python=3.6 numpy=1.16.4 numpy-base=1.16.4 tzlocal=2.0.0 pandas=0.25.0 seaborn=0.11.0 rpy2==2.9.4 r=3.6.0 r-base=3.6.0 r-essentials=3.6.0 r-tidyverse=1.2.1 rtools=3.4.0 r-rjsdmx=2.1_0 r-seasonal=1.7.0 rstudio=1.1.456
 ```
 
-#### dev_2021: Year 2021 version with Python 3.8.5 and R 3.6.3**
+#### dev_2021: Python 3.8.5 and R 3.6.3
 
 ```
 mamba create --name dev2021 anaconda=2020.11 rpy2=3.4.2 r-base=3.6.3 r-essentials=3.6 rtools=3.4.0 r-rjsdmx=2.1_0 r-seasonal=1.8.1
 ```
-Note about *dev_2021*:
- - There is a problem with *rstudio* installation for this environment. RStudio version 1.1.456, which is the newest available in `conda`, seems too old for the environment set-up. This causes an error and prevents installation of RStudio. We might be able to use a standalone installation of RStudio and connect it to the R in *dev2021*, but this might lead to problems when switching between R installations. For this reason, before *r-rstudio* package is updated for Anacondawe cannot install RStudio into `dev2021` environment.
+Notes about `dev2021`:
+
+ - There is a problem with `rstudio` installation for this environment. RStudio version 1.1.456, which is the newest available in `conda`, seems too old for the environment set-up. This causes an error and prevents installation of RStudio. We might be able to use a standalone installation of RStudio and connect it to the R in `dev2021`, but this might lead to problems when switching between R installations. For this reason, before `r-rstudio` package is updated for Anacondawe cannot install RStudio into `dev2021` environment.
+
+#### dev_2021b: Python 3.9.7 and R 3.6.3
+
+```
+mamba create --name dev2021b anaconda=2021.11 rpy2=3.4.2 r-base=3.6.3 r-essentials=3.6 rtools=3.4.0 r-rjsdmx=2.1_0 r-seasonal=1.8.1 jupyterlab=3.* ipykernel=6.*
+```
+
+Notes about `dev_2021b`:
+
+ - Compared to `dev_2021`, has newer versions of `jupyterlab` and `ipykernel` supporting notebook debugging.
+ - Same caveat as in `dev_2021` applies for `rstudio`.
 
 ### Jupyter kernel set-up for new environments
 
@@ -141,14 +154,25 @@ Finally, run test files to see if everything works:
  - R.R (e.g. in RStudio installed with the environment);
  - R.ipynb (in Jupyter).
 
-See section *Using NoobQuant `conda` environments* below for more on how to run the examples.
+See section *Using `conda` environments* below for more on how to run the examples.
 
-## Using NoobQuant `conda` environments
+## Using `conda` environments
 
-In this section we cover tips on how to use the new `conda` environment. There are some general tips that one should consider:
+In this section we cover tips on how to use the new `conda` environment. 
 
- - Make sure Python executable points to one in the new `conda` environment (check with `import sys; print(sys.executable)`). The path should be something like *~/Anaconda3/envs/<env_name>/python.exe*. Also make sure that Python import paths include the packages directory of the new environment (check with `print(sys.path)`). The path should be something like *~/Anaconda3/envs/<env_name>/~*.
+### Some general tips
+
+ - Make sure Python executable points to one in the new `conda` environment (check with `import sys; print(sys.executable)`). The path should be something like *~/Anaconda3/envs/<env_name>/python.exe*. Also make sure that Python import paths include the packages directory of the new environment (check with `print(sys.path)`). The path should be something like *~/Anaconda3/envs/<env_name>/*.
  - Make sure R executable points to one in the new `conda` environment (check with `print(file.path(R.home("bin"))`). The path should be something like *~/Anaconda3/envs/<env_name>/lib/R/bin/x64*. Also make sure R import paths contain **only** the packages directory of the new environment (`print(.libPaths())`). The path should be something like *~/Anaconda3/envs/<env_name>/lib/R/library*. If there are other paths, reset the paths using `.libPaths("~/Anaconda3/envs/<env_name>/lib/R/library")`.
+   - If `.libPaths()` contains other library paths (e.g. from different standalone R versions) wrong packages might be imported on notebook load-out, and these packages cannot be reloaded. This can cause compatibility problems with other packages in the notebook instance. The solution I can recommend is to be pedantic about R packages management. In particular, do not install any R packages into Windows *HOME* path (usually *User/Documents*) where other R versions might pick them up from. Always use separate package folders (outside of *HOME*) for each R version! See more about R load-out in text [[standalone_r.md]].
+- If Jupyter kernel dies/restarts when running `rpy2` commands (for example with error *"Fatal error: unable to initialize JIT!"*): The reason might be that `R HOME` path is not set and `rpy2` does not find the R installation that came with the environment (see [this](https://stackoverflow.com/a/53639407)). In this case we need to add a path for R in this particular Python kernel:
+  - Find the *kernel.json* for Python Jupyter kernel (e.g. *~/jupyter/dev2021_py/kernel.json*). Add section `"env": {"R_HOME":"/home/your/anaconda3/envs/my-env-name/lib/R"}`. For more, see [this](https://stackoverflow.com/a/60869259/7037299) and [this](https://stackoverflow.com/questions/39347782/getting-segmentation-fault-core-dumped-error-while-importing-robjects-from-rpy2/53639407#53639407).
+  - An ad-hoc solution in a single notebook is:
+    ```
+    import os
+    os.environ['R_HOME'] = '~/Anaconda3/envs/<env_name>/lib/R'
+    ```
+- In theory, Python and R kernels of the new `conda` environment should be accessible in Jupyter when run from *base* `conda` environment, see [here](https://ipython.readthedocs.io/en/stable/install/kernel_install.html) under section *"you can make your IPython kernel in one env available to Jupyter in a different env"*. However, I have run to all kinds of problems with the R kernel, e.g. [this](https://github.com/IRkernel/IRkernel/issues/309), [this](https://github.com/jupyter/jupyter/issues/353), and R installation not being found when called from Python instance with *rpy2*. Thus, I have found it easier to use Jupyter Lab from within each `conda` environment. This is why we install Jupyter in every environment and not just in `base` as usually suggested (see e.g. discussion [here](https://stackoverflow.com/a/39623487/7037299)). Make sure to launch Jupyter from custom environment (e.g. first `conda activate dev2021`, and only then `jupyter lab`).
 
 ### Using Python and R in Jupyter Lab
 
@@ -160,14 +184,6 @@ jupyter lab
 ```
 
 This opens up Jupyter Lab in the browser. If Jupyter kernels for the environment were correctly set up, they will be visible on the launcher page. Test running *python.ipynb* (here with *dev2021* environment) in `dev2021_py` kernel and *R.ipynb* using `dev2021_py` kernel. Make sure you choose a correct kernel for each notebook (top-right corner).
-
-Common problems that might arise:
-
-- If Jupyter kernel dies/restarts when running *rpy2* commands, the reason might be that `R HOME` path is not set and *rpy2* does not find the R installation that came with the environment. In this case we need to add a path for R in this particular Python kernel:
-  - Find the *kernel.json* for Python Jupyter kernel (e.g. *~/jupyter/dev2021_py/kernel.json*)
-  - Add `"env": {"R_HOME":"/home/your/anaconda3/envs/my-env-name/lib/R"}`, see [this](https://stackoverflow.com/a/60869259/7037299). Also helpful might be [this](https://stackoverflow.com/questions/39347782/getting-segmentation-fault-core-dumped-error-while-importing-robjects-from-rpy2/53639407#53639407).
-- One problem with R in Jupyter notebooks might be that `.libPaths()` contains other library paths (from different standalone R versions) that precede the correct one of the `conda` environment. When this happens, wrong packages might be used on notebook loadout, and these packages cannot be reloaded. This can cause compatibility problems with other packages in the notebook instance. The solution I can recommend is to be pedantic about R packages management. In particular, do not install any R packages into Windows *HOME* path (usually *User/Documents*) where other R versions might pick them up from. Always use separate package folders (outside of *HOME*) for each R version! See more about R load-up in text *standalone_r.md*.
-- In theory, Python and R kernels of the new `conda` environment should be accessible in Jupyter when run from *base* `conda` environment, see [here](https://ipython.readthedocs.io/en/stable/install/kernel_install.html) under section *"you can make your IPython kernel in one env available to Jupyter in a different env"*. However, I have run to all kinds of problems with the R kernel, e.g. [this](https://github.com/IRkernel/IRkernel/issues/309), [this](https://github.com/jupyter/jupyter/issues/353), and R installation not being found when called from Python instance with *rpy2*. Thus, I have found it easier to use Jupyter Lab from within each `conda` environment. This is why we install Jupyter in every environment and not just in `base` as usually suggested (see e.g. discussion [here](https://stackoverflow.com/a/39623487/7037299)). Make sure to launch Jupyter from custom environment (e.g. first `conda activate dev2021`, and only then `jupyter lab`).
 
 ### Using R in RStudio
 
@@ -211,7 +227,7 @@ Not yet possible, but coming: see [here](https://github.com/Microsoft/vscode-pyt
 
 ### Calling R from a Python instance
 
-Calling R from a Python instance is achieved using package *rpy2*. There are two examples how to do this, and many more if you google them!
+Calling R from a Python instance is achieved using package `rpy2`. There are two examples how to do this, and many more if you google them!
  - In python.ipynb there is a Jupyter notebook example how to pass items between different instances, using cell magics.
  - In python.py there is an example using rpy2 objects.
 
