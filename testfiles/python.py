@@ -1,16 +1,17 @@
 """
 Minimalistic Python test file. See python.ipynb for more robust tests.
 
-Tested with dev 2018 and dev2021. Some differences in code syntax, make sure to
-select variable conda_env_ver appropriately depending on which environment is
-used.
+Tested with dev2018, dev2021, and dev2023a. There are some differences in
+code syntax between versions, make sure to set variable conda_env_ver
+appropriately depending on which environment is used.
 
-If rpy2 calls fail, try setting R_HOME path explicitly below.
+If rpy2 calls to R fail (e.g., warning "Unable to initialize JIT"), set R_HOME
+path explicitly below.
 """
-conda_env_ver = "dev2018" # either dev2018 pr dev2021
+conda_env_ver = "dev2023a" # dev2018/dev2021/dev2023a
 
 # Set R_HOME path explicitly, change path string to your location
-#import os
+import os
 #os.environ['R_HOME'] = '/Users/<your user>/anaconda3/envs/<env name>/lib/R'
 
 # Imports
@@ -50,11 +51,11 @@ ro.r('''
 transform_df = ro.globalenv['transform_df']
 
 pd_df = pd.DataFrame({
-    'int_values': [1,2,3],
+    'int_values': [1, 2, 3],
     'str_values': ['abc', 'def', 'abc']
 })
 
-if conda_env_ver == "dev2021":
+if conda_env_ver in ["dev2021", "dev2023a"]:
 
   with localconverter(ro.default_converter + pandas2ri.converter):
     r_df = ro.conversion.py2rpy(pd_df)
@@ -70,6 +71,5 @@ elif conda_env_ver == "dev2018":
   r_df = pandas2ri.py2ri(pd_df)
   r_df = transform_df(r_df)
   pd_df_again = pandas2ri.ri2py_dataframe(r_df)
-
 
 print(pd_df_again)

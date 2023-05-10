@@ -10,7 +10,6 @@ print(.libPaths())
 # Test imports
 library(tidyverse)
 library(ggplot2)
-library(RJSDMX)
 library(datasets)
 
 # Test tidyverse packages

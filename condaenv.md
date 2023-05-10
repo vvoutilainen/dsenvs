@@ -1,48 +1,47 @@
 # `conda` data science environments
 
-**By Ville Voutilainen/NoobQuant, updated 2021-09-29.**
+**By Ville Voutilainen, updated 2021-09-29.**
 
 **MIT license, usage at one's own risk!**
 
 ## Introduction
 
-This article is my "cookbook recipe" on how to build tailored `conda` environments for everyday data science work with Python and R. The article covers following topics:
+This article provides my "cookbook recipes" on how to build tailored `conda` environments for everyday data science work in Python and R. The article covers following topics:
 
  - How to install `conda` environments containing fresh Python and R installations;
  - How to install packages to the environments;
  - How to run Python and R instances, separately and together, in Jupyter Lab, VSCode, and RStudio.
 
-The instructions are written for a **Windows 10 machine**. They might be applicable to other operating systems to some degree, but no guarantees are made.
+The instructions are written for a **Windows 10 machine**. They might be applicable to other operating systems as well, but no guarantees are made.
 
 ### What are Anaconda, `conda`, and `conda` environments?
 
-[Anaconda](https://www.anaconda.com/) is a popular data science platform for several programming languages, most notably Python and R. Anaconda is also a company pursuing all kinds of ends, but here we focus on the software it provides. Anaconda lets you run Python and R in virtual **environments**, which constitute a logically separable playing fields for your data science experiments. The environments can be loaded up with different versions of Python and R programs as well as bundles of **packages** (aka. libraries) that power your work. Both environments and packages are managed with `conda`, the package manager of Anaconda.
+[Anaconda](https://www.anaconda.com/) is a popular data science platform for several programming languages, most notably Python and R. Anaconda is also a company pursuing many ends, but here we focus on the software it provides. Anaconda lets you run Python and R in virtual **environments** which constitute logically separable playing fields for data science experiments. The environments can be loaded up with different versions of Python and R programs as well as bundles of **packages** that power your work. Both environments and packages are managed with `conda`, the package manager of Anaconda.
 
-### Why to use tailored NoobQuant `conda` environments for data science work?
+### Why to use tailored `conda` environments for data science work?
 
-Python and R are great tools for data science. The web is full of discussions which one is better, but in my opinion these conversations often miss the mark. Each language has its own advantages and there are huge benefits in being able to flexibly change between the two.
+Python and R are great tools for data science. The web is full of discussion which one is better, but in my opinion these conversations often miss the mark. Each language has its own merits and there are huge benefits in being able to flexibly change between the two.
 
 For example, Python is great for machine learning as well as for general infrastructure around the data science workflow. On the other hand, R offers a much broader set of statistical tools. The goal of this article is to build an environment where one can employ the best parts of both worlds, on the fly!
 
-A clear advantage of `conda` comes with its dependency management capabilities. Maintaining Python or R packages and versions can be a hazzle, let alone doing the same for both. `conda` environments are, according to my knowledge, the best way to manage package and program versions over time and across each other. It offers reproducible data science environments that one can spin up whenever needed. Being diligent about the software versions will make life much easier and may save you from the cardinal sin of producing irreproducible science and/or code.
+A clear advantage of `conda` comes with its dependency management capabilities. Maintaining Python or R packages and versions can be a hazzle, let alone doing the same for both. `conda` environments are, according to my knowledge, the best way to manage package and program versions over time and across each other. It offers reproducible data science environments that one can spin up whenever needed. Being diligent about the software versions will make life much easier and may save you from the cardinal sin of producing irreproducible science and code.
 
-With **NoobQuant `conda` environments** one can, for example:
+With custom `conda` environments one can
 
  - Run Python in VSCode or Jupyter Lab;
  - Run R in RStudio or Jupyter Lab;
  - Call R code from a Python instance with *rpy2*;
  - Use typical Python data science packages such as *pandas* and *scikit learn*;
  - Use typical R data science packages such as *tidyverse*.
- - Fetch economic time series from public APIs using *rjsdmx*.
 
-### When **not** to use NoobQuant `conda` environments?
+### When **not** to use custom `conda` environments?
 
-The custom environments I use are not perfect nor suited for every occasion. They have evolved based on personal preferences of someone who does most of the work in Python, but every now and then needs R for running statistical analyses.
+The custom environments described here are not perfect nor suited for every occasion. They have evolved based on personal preferences of someone who does most of the work in Python but every now and then needs R for running statistical analyses.
 
-NoobQuant `conda` environments proposed in this article may not be for you if:
+Custom `conda` environments proposed in this article may not be for you if:
 
- - **You solely use R**. R environment dependency management as itself might be easier with other tools, such as *packrat*. The power of `conda` environments comes from Python package management and combining that with R or even Julia. Also, `conda` often does not offer latest R packages.
- - **You are afraid of getting your hands dirty**. Installing and managing `conda` environments might be time consuming at times, although in the long run I believe it pays for itself in reproducibility. If you do not like the "extra" work that comes with being able to fully customize the tools for your needs, then NoobQuant `conda` environments might not be your thing.
+ - **You solely use R**. R environment dependency management as itself might be easier with other tools, such as *packrat*. The power of `conda` environments comes from Python package management and combining that with R or even Julia. Also, `conda` often does not offer the latest R packages.
+ - **You are afraid of getting your hands dirty**. Installing and managing `conda` environments can be time consuming, although in the long run I believe the cost is well compensated by reproducibility. If you do not like the extra work that comes with being able to fully customize the tools for your needs, then custom `conda` environments might not be your cup of tea.
 
 ## Building tailored `conda` environments
 
@@ -82,12 +81,16 @@ In this article we use Anaconda version *2020.02-Windows-x86_64*. Download and r
 
 ### Installing environments
 
-Open Anaconda prompt, where most of the commands will be given. We start by telling `conda` to add a few extra channels to the list where to look for packages from. The channels to be added are *conda-forge* and *r*. Python packages tend to be faster available in *conda-forge* than in default channels. *r* is needed for R packages.
+Now open Anaconda prompt. This is where most of the commands will be given.
+
+We start by telling `conda` to add one extra channel to the list of [default channels](https://docs.anaconda.com/free/anaconda/reference/default-repositories/) from where to look for packages: *conda-forge*. Packages tend to be faster available in *conda-forge* than in the default channels. Notice, however, that *conda-forge* packages are not per se curated by Anaconda.
 
 ```
-conda config --add channels conda-forge
-conda config --add channels r
+conda config --set channel_priority flexible
+conda config --append channels conda-forge
 ```
+
+The above commands do two things: 1) Set channel priority to 'flexible' and 2) appends *conda-forge* as as a lower priority channel compared to default channels. See [here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html) for more. You can check your *.condarc* file to make sure that *conda-forge* comes as the last channel. 
 
 Next, install [mamba](https://github.com/TheSnakePit/mamba) in the `base` conda environment. `mamba` is a faster, drop-in replacement for `conda`. Later we will replace `conda` commands with `mamba` for increased speed in solving package dependencies.
 
@@ -95,13 +98,14 @@ Next, install [mamba](https://github.com/TheSnakePit/mamba) in the `base` conda 
 conda install mamba
 ```
 
-Now we can install a custom `conda` environment. There are two tested *NoobQuant* `conda` environments. One can also both, but make sure to complete the installation fully for each environment before starting with the other.
+Now we can install a custom `conda` environment. I have created and used following environments:
 
  - `dev2018`: Python 3.6.10 and R 3.6.0
  - `dev2021`: Python 3.8.5 and R 3.6.3
  - `dev2021b`: Python 3.9.7 and R 3.6.3
+ - `dev2023a`: Python 3.10.9 and R 4.1.3
 
-To build either one of the environments, run commands as detailed in subsections.
+To build either one of the environments, run commands as detailed in the following subsections.
 
 #### dev_2018: Python 3.6.10 and R 3.6.0
 
@@ -129,9 +133,20 @@ Notes about `dev_2021b`:
  - Compared to `dev_2021`, has newer versions of `jupyterlab` and `ipykernel` supporting notebook debugging.
  - Same caveat as in `dev_2021` applies for `rstudio`.
 
-### Jupyter kernel set-up for new environments
+ #### dev_2023a: Python 3.10.9 and R 4.1.3
 
-*Jupyter notebooks* are my preferred way to use Python and R. In order to use the freshly installed Python and R versions in Jupyter notebooks, we need to install *kernels* that tell Jupyter from where to look for the programs. To this end, we specify kernels with unique names so that we can have IPython/IR kernels for each `conda` environment separately (see more [here](https://ipython.readthedocs.io/en/stable/install/kernel_install.html)).
+```
+mamba create --name dev2023a anaconda=2022.10 rpy2 r-base=4.1 r-essentials rtools
+```
+
+Notes about `dev_2023a`:
+
+ - Upgrades R to version 4.
+ - Compared to previous environments, drops some specific R packages as they may be installed later on.
+
+### Setting up Jupyter kernels for the environments
+
+*Jupyter notebooks* are my preferred way to use Python and R. In order to use the freshly installed Python and R versions with Jupyter notebooks, we need to install *kernels*. We specify the kernels with unique names so that we can have IPython/IR kernels for each `conda` environment separately (see more [here](https://ipython.readthedocs.io/en/stable/install/kernel_install.html)).
 
 Run following commands in `conda` prompt to install Python and R kernel for the environment. Here we use `dev2021` as an example. Change the names depending on which environment was installed.
 
@@ -143,16 +158,28 @@ IRkernel::installspec(name='dev2021_r', displayname='dev2021_r')
 quit()
 ```
 
-This should add two folders under Jupyter kernels directory (typically under *C:\Users\<myusername>\AppData\Roaming\jupyter\kernels*). Check that the folders are created.
+This should add two folders under the Jupyter kernels directory (typically under *C:\Users\<myusername>\AppData\Roaming\jupyter\kernels*). Check that the folders are created.
+
+### Setting paths
+
+In order to use `rpy2` to call R from Python, the Python instance has to know where the R executable is located. Otherwise `rpy2` calls will die or crash. See [this](https://stackoverflow.com/a/53639407) for more. To set `R_HOME` path:
+
+  - An ad-hoc solution that works for all Python instances (terminal, Jupyter):
+    ```
+    import os
+    os.environ['R_HOME'] = '~/Anaconda3/envs/<env_name>/lib/R'
+    ```
+ - A more permanent solution for Jupyter: Find the *kernel.json* for Python Jupyter kernel (e.g., *~/jupyter/dev2021_py/kernel.json*). Add parameter `"env": {"R_HOME":"/home/your/anaconda3/envs/my-env-name/lib/R"}` into the file. See [this](https://stackoverflow.com/a/60869259/7037299) and [this](https://stackoverflow.com/questions/39347782/getting-segmentation-fault-core-dumped-error-while-importing-robjects-from-rpy2/53639407#53639407) for more.
+
 
 ### Testing the installations
 
-Finally, run test files to see if everything works:
+Finally, run test files in folder *testfiles* to see if everything works:
 
- - python.py (e.g. in VSCode);
- - python.ipynb (in Jupyter or VSCode);
- - R.R (e.g. in RStudio installed with the environment);
- - R.ipynb (in Jupyter).
+ - *python.py* (e.g., in VSCode)
+ - *python.ipynb* (in Jupyter or VSCode)
+ - *R.R* (in command line or in RStudio installed with the environment)
+ - *R.ipynb* (in Jupyter)
 
 See section *Using `conda` environments* below for more on how to run the examples.
 
@@ -165,14 +192,8 @@ In this section we cover tips on how to use the new `conda` environment.
  - Make sure Python executable points to one in the new `conda` environment (check with `import sys; print(sys.executable)`). The path should be something like *~/Anaconda3/envs/<env_name>/python.exe*. Also make sure that Python import paths include the packages directory of the new environment (check with `print(sys.path)`). The path should be something like *~/Anaconda3/envs/<env_name>/*.
  - Make sure R executable points to one in the new `conda` environment (check with `print(file.path(R.home("bin"))`). The path should be something like *~/Anaconda3/envs/<env_name>/lib/R/bin/x64*. Also make sure R import paths contain **only** the packages directory of the new environment (`print(.libPaths())`). The path should be something like *~/Anaconda3/envs/<env_name>/lib/R/library*. If there are other paths, reset the paths using `.libPaths("~/Anaconda3/envs/<env_name>/lib/R/library")`.
    - If `.libPaths()` contains other library paths (e.g. from different standalone R versions) wrong packages might be imported on notebook load-out, and these packages cannot be reloaded. This can cause compatibility problems with other packages in the notebook instance. The solution I can recommend is to be pedantic about R packages management. In particular, do not install any R packages into Windows *HOME* path (usually *User/Documents*) where other R versions might pick them up from. Always use separate package folders (outside of *HOME*) for each R version! See more about R load-out in text [[standalone_r.md]].
-- If Jupyter kernel dies/restarts when running `rpy2` commands (for example with error *"Fatal error: unable to initialize JIT!"*): The reason might be that `R HOME` path is not set and `rpy2` does not find the R installation that came with the environment (see [this](https://stackoverflow.com/a/53639407)). In this case we need to add a path for R in this particular Python kernel:
-  - Find the *kernel.json* for Python Jupyter kernel (e.g. *~/jupyter/dev2021_py/kernel.json*). Add section `"env": {"R_HOME":"/home/your/anaconda3/envs/my-env-name/lib/R"}`. For more, see [this](https://stackoverflow.com/a/60869259/7037299) and [this](https://stackoverflow.com/questions/39347782/getting-segmentation-fault-core-dumped-error-while-importing-robjects-from-rpy2/53639407#53639407).
-  - An ad-hoc solution in a single notebook is:
-    ```
-    import os
-    os.environ['R_HOME'] = '~/Anaconda3/envs/<env_name>/lib/R'
-    ```
-- In theory, Python and R kernels of the new `conda` environment should be accessible in Jupyter when run from *base* `conda` environment, see [here](https://ipython.readthedocs.io/en/stable/install/kernel_install.html) under section *"you can make your IPython kernel in one env available to Jupyter in a different env"*. However, I have run to all kinds of problems with the R kernel, e.g. [this](https://github.com/IRkernel/IRkernel/issues/309), [this](https://github.com/jupyter/jupyter/issues/353), and R installation not being found when called from Python instance with *rpy2*. Thus, I have found it easier to use Jupyter Lab from within each `conda` environment. This is why we install Jupyter in every environment and not just in `base` as usually suggested (see e.g. discussion [here](https://stackoverflow.com/a/39623487/7037299)). Make sure to launch Jupyter from custom environment (e.g. first `conda activate dev2021`, and only then `jupyter lab`).
+- If Jupyter kernel dies/restarts when running `rpy2` commands (for example with error *"Fatal error: unable to initialize JIT!"*), the reason might be that `R HOME` path is not set and `rpy2` does not find the R installation that came with the environment. In this case, return to section "Setting paths" above and make sure path to `R HOME` is set.
+- In theory, Python and R kernels of the new `conda` environment should be accessible in Jupyter when run from *base* `conda` environment, see [here](https://ipython.readthedocs.io/en/stable/install/kernel_install.html) under section *"you can make your IPython kernel in one env available to Jupyter in a different env"*. However, I have run to all kinds of problems with the R kernel, e.g. [this](https://github.com/IRkernel/IRkernel/issues/309), [this](https://github.com/jupyter/jupyter/issues/353), and R installation not being found when called from Python instance with *rpy2*. Thus, I have found it easier to use Jupyter Lab from within each `conda` environment. This is why we install Jupyter in every environment and not just in `base` as usually suggested (see e.g. discussion [here](https://stackoverflow.com/a/39623487/7037299)). Make sure to launch Jupyter from custom environment (e.g., `conda activate dev2021`, and only then `jupyter lab`).
 
 ### Using Python and R in Jupyter Lab
 
@@ -216,30 +237,30 @@ Make sure that VSCode launches Jupyter instance by from desired custom `conda` e
 
 **R files**
 
-**Cannot get the VSCode R Terminal for R version in conda environment to work!** The reason seems to be that the vanilla R terminal in versions coming with the NoobQuant conda environments is missing some required .dlls, preventing R terminal from launching. This probably also prevents the launch of VSCode Interactive R terminal (works just fine for a standalone R installation). If I would only get the vanilla terminal to work in the conda R versions, I think this would help with VSCode terminal, too. Typical instructions for using given R executable in VSCode would be as follows: 
+**I haven't gotten the VSCode R Terminal for R version in conda environment to work!** The reason seems to be that the vanilla R terminal in versions coming with the custom conda environments is missing some required .dlls, preventing R terminal from launching. This probably also prevents the launch of VSCode Interactive R terminal (works just fine for a standalone R installation). If I would only get the vanilla terminal to work in the conda R versions, I think this would help with VSCode terminal, too. Typical instructions for using given R executable in VSCode would be as follows: 
   - Download VSCode extensions [R](https://marketplace.visualstudio.com/items?itemName=Ikuyadeu.r) and make sure [R LSP Client](https://marketplace.visualstudio.com/items?itemName=REditorSupport.r-lsp).
   - Install R language service package to the conda environment: `mamba install r-languageserver`
   - Set R and R LSP extension paths in VSCode settings.json. This can be done either at global level or at project level as per usual with VSCode settings. Further instructions [in this video](https://www.youtube.com/watch?v=INP-FsluDuk&t) and [this article](https://medium.com/analytics-vidhya/a-fresh-start-for-r-in-vscode-ec61ed108cf6).
 
 **R notebooks**
 
-Not yet possible, but coming: see [here](https://github.com/Microsoft/vscode-python/issues/5078).
+Previously this was not possible, but might have been solved now. See [here](https://github.com/Microsoft/vscode-python/issues/5078).
 
 ### Calling R from a Python instance
 
 Calling R from a Python instance is achieved using package `rpy2`. There are two examples how to do this, and many more if you google them!
- - In python.ipynb there is a Jupyter notebook example how to pass items between different instances, using cell magics.
- - In python.py there is an example using rpy2 objects.
+ - In *python.ipynb* there is a Jupyter notebook example how to pass items between different instances, using cell magics.
+ - In *python.py* there is an example using rpy2 objects.
 
 ### Calling Python from an R instance
 
-**I have not explored this yet**. Everything should be directly available using *reticulate* package, however.
+**I have not explored this yet**. Everything needed should be available via *reticulate* package, however.
 
 ## Adding packages to environments
 
 **Python/R packages using `conda`**
 
-The benefit of using `conda` environments comes from managing dependencies between packages. When installing packages with `conda`, it tries to make sure that new packages do not cause conflicts in the environment. Thus, no matter if Python or R package, **always try installing packages first via `conda`** (or rather with `mamba`, which is a faster, drop-in replacement for `conda`):
+The benefit of using `conda` environments comes from managing dependencies between packages. When installing packages with `conda`, it tries to make sure that new packages do not cause conflicts in the environment. Thus, no matter if Python or R package, **always try installing packages via `conda` first** (or rather with `mamba`, which is a faster, drop-in replacement for `conda`):
 
 ```
 conda activate <env_name>
