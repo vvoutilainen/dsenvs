@@ -1,6 +1,6 @@
 # `conda` data science environments
 
-**By Ville Voutilainen, updated 2021-09-29.**
+**By Ville Voutilainen, updated 2023-05-10.**
 
 **MIT license, usage at one's own risk!**
 
