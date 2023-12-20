@@ -144,12 +144,13 @@ Notes about `dev_2023a`:
 Environment that uses *conda-forge* as little as possible. Make sure to remove *conda-forge* from the channel list!
 
 ```
-mamba create --name dev2023b anaconda=2022.10 tzlocal=2.1 r-base=3.6.* r-essentials=3.6.* r-tidyverse=1.2.1 rtools
+mamba create --name dev2023a_minforge anaconda=2022.10 tzlocal=2.1 r-base=3.6.* r-essentials=3.6.* r-tidyverse=1.2.1 rtools
+conda activate dev2023a_minforge
 mamba install r-tidyselect=1.1.1 -c conda-forge --no-deps
 mamba install rpy2=3.5.1 -c conda-forge --no-deps
 ```
 
-Notes about `dev2023b_minforge`:
+Notes about `dev2023a_minforge`:
 
  - Similar to dev2023a, but minimizes the need of packages from *conda-forge* channel.
  - Anaconda default channels do not have a newer version of R than 3.6 (updated 2023-12-20).
