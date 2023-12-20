@@ -1,55 +1,100 @@
-# Installing standalone R next to NoobQuant `conda` environments
+# Using standalone R in conjunction with `conda` environments
 
-**By Ville Voutilainen/NoobQuant, updated 2021-07-21.**
+**By Ville Voutilainen, updated 2023-12-20.**
 
 **MIT license, usage at one's own risk!**
 
-This note goes through how to make a standalone R installation and how to use it in conjunction with NoobQuant `conda` environments with separate R and Python installations. A standalone R installation might be a useful addition as R via Anaconda updates slowly and new/working package versions might not be available.
+This note explains how to install and use a standalone R version in conjunction with tailored `conda` environments, as explained in the text [[condaenv.md]]. A standalone R installation might be useful as R packages in Anaconda default channels update slowly and might not always be available.
 
 A very good text on installing and using R can be found in [Efficient R Programming](https://csgillespie.github.io/efficientR/).
 
-## About suitable environment setting
+## Notes on R environments
 
-R sessions are controlled using *.Rprofile* and *.Renviron* files. More info on these files can be found [here](https://support.rstudio.com/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf) and [here](https://csgillespie.github.io/efficientR/set-up.html#r-startup).
+R sessions are controlled using hte files *.Rprofile* and *.Renviron*. In order to use R effectively, we need to specify some needed content for these files. More information on these files can be found [here](https://support.rstudio.com/hc/en-us/articles/360047157094-Managing-R-with-Rprofile-Renviron-Rprofile-site-Renviron-site-rsession-conf-and-repos-conf) and [here](https://csgillespie.github.io/efficientR/set-up.html#r-startup).
 
-There are three places where R searches for *.Rprofile*/*.Renviron* files when fired up (in order of search): Current project (`getwd()`) > *HOME* (`Sys.getenv("HOME")`) > *R_HOME* (`Sys.getenv("R_HOME")`). We want to be able to run different versions of R on the machine, so a preferable option would be to have the files at *R_HOME* for each R separately. Unfortunately, it seems that putting files under *R_HOME* does not work, that is, R session does not find the files although there are no files in the other two preferred paths. *HOME* level is too broad, as then multiple R instances would be using the same files.
+There are three places where R searches for *.Rprofile* and *.Renviron* (in order of search): 
+ 1. Current project — `getwd()`
+ 2. *HOME* — `Sys.getenv("HOME")`
+ 3. *R_HOME* — `Sys.getenv("R_HOME")`
 
-This leaves us with following choices
- - separate *.Rprofile* and *.Renviron* files for each project. This is the preferred option and is not that big of a hindrance, as it easy to copy the prepared files under each project and fire up R from this directory (see below for more);
- - if we need only contents of *.Rprofile* (which can be sourced in each R script) in the session, then we can store it in a custom path and source it when needed. This will become handy when installing a Jupyter R kernel for the standalone R installation (see below). Note that it makes no use to put *.Renviron* here as it cannot be sourced from custom location.
+How to use the control files depends on the needed use of R.
 
-## `r_sa_2021`: NoobQuant R standalone v4.1.0 installation
+### Case with multiple R versions
 
-### R installation
+If we want to be able to run different versions of standalone R on the machine, the *HOME* level is too broad, as then multiple R instances would be using the same files. A preferable option would be to have the control files at the level of *R_HOME*, separately for each standalone R version. Unfortunately, it seems that putting the control files under *R_HOME* does not work for some reason (the R session does not find the files, even when there are no files in the other two preferred paths).
 
- - Install R. Tested with R 4.1.0. This was the newest binary so easy install, but can be installed from older tar.gz files if Rtools is installed first.
- - Check for *HOME* level files (*.Rprofile* and *.Renviron*) with `Sys.getenv("HOME")` and delete them.
- - Check for *R_HOME* level files (*.Rprofile* and *.Renviron*) with `Sys.getenv("R_HOME")`. Delete them.
- - Add a folder *"R-x.x.x-packages"* in a custom path <my_custom_path> where x's correspond to the R version number being installed. The path may be *R_HOME*, but this might be unavailable if it is behind admin privileges. Add two folders in the path: *rfiles* and *packages*.
+This leaves us with the project-level option. That is, we will have separate *.Rprofile* and *.Renviron* files for each project. This is perhaps slightly inconvenient, but at the end of the day, not too big of a hindrance, as we can simply copy the prepared files under each project.
 
-### Rtools40 v2 installation
+If we only need to set *.Rprofile* and don't need *.Renviron*, things become easier: *.Rprofile* can be sourced in a session in a custom manner when needed, whereas *.Renviron* is sourced on session start only from the three paths given below. This means that we could store *.Rprofile* in a single custom path (and not in every project folder) and source it manually when needed (this will actually become handy when installing a Jupyter R kernel; see below).
 
- - Install RTools using Windows binaries. Tested *rtools40v2-x86_64.exe*. This installs folder *rtools40* with RTools in chosen path.
- - Add *RTOOLS40_HOME* to Windows PATH: Environment variables -> User variables -> Name: RTOOLS40_HOME, Path: "C\:path_to_rtools" (e.g. "C:\Program Files\rtools40").
+### Case with a single R version
 
-### Preparing user files
+When we are sure we don't need multiple standalone R versions, we can simply put both *.Rprofile* and *.Renviron* under *HOME*.
 
-Prepare (project-level) *.Rprofile* file:
+##  R standalone installation
+
+Next, we describe the procedure for installing a standalone R program. The installation will be called `r_sa_2021` and includes R version 4.1.0.
+
+### R program installation
+
+ -  Download the R program from [here](https://cran.r-project.org/bin/windows/base/) and install it using the wizard.
+ - Find and remove default control files *.Rprofile* and *.Renviron*:
+   - Level *HOME*: `Sys.getenv("HOME")` 
+   - Level *R_HOME*: `Sys.getenv("R_HOME")` 
+ - Add a folder *"R-x.x.x-packages"* (where x's correspond to the R version number being installed) in a path of choice.
+   - The path may be *R_HOME*, as long as the user has read and write rights to the folder. For example, if *R_HOME* is behind admin rights and the user is not an admin, then *R_HOME* won't do it.
+ - Add two folders in the created folder: *rfiles* and *packages*.
+
+### Rtools installation
+
+RTools is needed to build R packages from source.
+
+ - Install RTools from [here](https://cran.r-project.org/bin/windows/Rtools/). The tested version is *rtools40v2-x86_64.exe*.
+   - This installs folder *rtools40* with RTools in a chosen path.
+ - Add *RTOOLS40_HOME* to Windows PATH (if it does not happen automatically): Environment variables -> User variables -> Name: RTOOLS40_HOME, Path: "path_to_rtools" (e.g., "C:\Program Files\rtools40").
+
+### RStudio installation
+
+Optionally, one can also install RStudio.
+
+### Preparing control files
+
+Next, we prepare the needed control files.
+
+#### Case with multiple R versions
+
+Prepare project-level *.Rprofile* file and place it in the project folder. The file will specify the previously created folder as the place to store installed packages.
 
 ```
-message("Custom .Rprofile has been loaded from <project name here>!")
+message(".Rprofile has been loaded from <project name here>!")
 .libPaths("my_custom_path/R-x.x.x-packages/packages")
 ```
 
-Prepare *.Rprofile* file for R Jupyter kernel:
+Prepare another "R installation level" *.Rprofile* file. This is meant for the R Jupyter kernel. We can put the file into a custom path, say the above-created *rfiles* folder, or under *R_HOME* (the kernel specs will explicitly refer to this file with a path).
 
 ```
-message("Custom .Rprofile has been loaded from rfiles folder!")
-.libPaths("my_custom_path/R-x.x.x-packages/rfiles")
+message(".Rprofile has been loaded from rfiles folder!")
+.libPaths("my_custom_path/R-x.x.x-packages/packages")
 ```
 
-Prepare (project-level) *.Renviron* file:
+Finally, prepare a project-level *.Renviron* file and place it in the project folder. The point is to adjust the PATH variable so that Rtools can be found.
 
+```
+# Adjust PATH variable so that Rtools can be found
+PATH="${RTOOLS40_HOME}\usr\bin;${PATH}"
+```
+
+#### Case with a single R version
+
+Prepare *.Rprofile* and *.Renviron* files and place them under *HOME*.
+
+*.Rprofile*:
+```
+message(".Rprofile has been loaded from HOME!")
+.libPaths("my_custom_path/R-x.x.x-packages/packages")
+```
+
+*.Renviron*:
 ```
 # Adjust PATH variable so that Rtools can be found
 PATH="${RTOOLS40_HOME}\usr\bin;${PATH}"
@@ -57,28 +102,44 @@ PATH="${RTOOLS40_HOME}\usr\bin;${PATH}"
 
 ### Using standalone R installation
 
- - Put project-level *.Rprofile* and *.Renviron* files in project folder.
- - Launch R or RStudio from command prompt from the project folder (careful with Windows paths, e.g. spaces need to be dealt with: `C:\Program^ Files\R\R-4.1.0\bin\R.exe`):
-   ```
-   cs project_folder
-   path/to/R/bin/R.exe
-   ```
- - This launches R and uses the project-level *.Rprofile* and *.Renviron* files. Test everything crucial works
-   - On launch, we should see the custom message from the project-level *.Rprofile*.
-   - Test that Rtools can be found: `Sys.which("make")` should return the RTools path. Then, test source installation via `install.packages("jsonlite", type = "source")`.
+#### Case with multiple R versions
 
-### Using standalone R via Jupyter installed with NoobQuant `conda` environments
+Launch R (or RStudio) from the command prompt in the project folder (be careful with Windows paths, spaces need to be dealt with: `C:\Program^ Files\R\R-4.1.0\bin\R.exe`). This way we are using the project-level *.Rprofile* and *.Renviron* files.
+   
+```
+cs project_folder
+path/to/R/bin/R.exe
+```
 
-Install R kernel so that `conda` environments know to use the standalone R installation. See [here](https://irkernel.github.io/installation/) and [here](https://github.com/IRkernel/IRkernel/blob/master/R/installspec.r)
+Next, test that everything crucial works:
+  - On launch, we should see the custom message from the project-level *.Rprofile*.
+  - Test that Rtools can be found: `Sys.which("make")` should return the RTools path. Then, test source installation. For example, using `install.packages("jsonlite", type="source")`.
 
- - Put *.Rprofile* file for Jupyter kernel under *my_custom_path/R-x.x.x-packages/rfiles*
- - Install kernel among rest of the `conda` kernels created by NoobQuant `conda` environment installations. Make sure to point to the *.Rprofile* file!
+#### Case with a single R version
+
+Simply launch R. Test that everything crucial works, as in the case with multiple R installations.
+
+### Using standalone R with tailored `conda` environments (in Jupyter)
+
+We need to install R kernel so that `conda` environments know from where to use the standalone R installation (see [here](https://irkernel.github.io/installation/) and [here](https://github.com/IRkernel/IRkernel/blob/master/R/installspec.r)).
+
+ - Install the kernel among the other kernels created for tailored `conda` environments by running the following code in the standalone R instance. The important thing is to point to the "R installation level" *.Rprofile* file created above:
+
     ```
     install.packages('IRkernel')
-    IRkernel::installspec(name='r_sa_2021', displayname='r_sa_2021', prefix="path_to_kernels/jupyter/kernels", rprofile="my_custom_path/R-x.x.x-packages/rfiles/.Rprofile")
+    IRkernel::installspec(name='r_sa_2021', displayname='r_sa_2021', prefix="path_to_kernels/jupyter/kernels", rprofile="~/R-x.x.x-packages/rfiles/.Rprofile")
     ```
- - The command created extra folder layers. Remove them by locating the folder *r_sa_2021* and copy-paste it to the same level with rest of the kernels. Delete empty folder layers.
- - Note that when running the standalone R thorugh Jupyter it does not get to know the content of proper *.Renviron* (it might see the content of other such file from `conda` installation), so that e.g. RTools might point to incorrect source (try with `Sys.which("make")`). This means that e.g. all Rtools related must be done in "proper" R instance, not via Jupyter kernel.
+   - The command may create extra folder layers. Remove them by locating the folder *r_sa_2021* and copy-paste it to the same level as the rest of the kernels. Delete empty folder layers.
+ 
+Some important additions:
+
+  - Python installations in the `conda` environments do not by default know where to look for the standalone R installation. When running R from Python, we need to specify the path to the standalone R installation (the path can be something like "C:\Program Files\R\R-x.x.x"):
+
+    ```
+    import os
+    os.environ['R_HOME'] = 'path to R folder'
+    ```
+ - Note that when running the standalone R through Jupyter, it does not get to know the content of proper *.Renviron* (it might see the content of other such files from a `conda` environment installation), so that, e.g., RTools might point to an incorrect source (try with `Sys.which("make")`). This means that, e.g., all Rtools-related stuff must be done in a "proper" R instance, not via the Jupyter kernel.
 
 ## Sources :
  - https://csgillespie.github.io/efficientR/set-up.html#r-startup
