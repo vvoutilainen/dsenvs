@@ -1,8 +1,10 @@
 # `conda` data science environments
 
-**By Ville Voutilainen, updated 2023-12-20.**
+**By Ville Voutilainen, updated 2026-04-19.**
 
 **MIT license, usage at one's own risk!**
+
+**Important update**: In November 2025, [Anaconda announced](https://www.anaconda.com/blog/changes-to-anacondas-r-channel-support) they will deprecate the R channel and discontinue active maintenance. R packages *will* remain available via community-maintained `conda-forge`. Therefore, unless one is willing to rely solely on conda-forge packages, using conda to manage both Python and R together is no longer a good option!
 
 ## Introduction
 
@@ -154,6 +156,33 @@ Notes about `dev2023a_minforge`:
 
  - Similar to dev2023a, but minimizes the need of packages from *conda-forge* channel.
  - Anaconda default channels do not have a newer version of R than 3.6 (updated 2023-12-20).
+
+#### dev2025a: Python 3.12
+
+Minimalistic Python-only installation relying solely on Anaconda's default channels.
+
+```
+conda env create -f environment.yml
+```
+
+*environment.yml*
+```
+name: dev2025
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - jupyter
+  - psycopg2
+  - sqlalchemy
+  - statsmodels
+  - pytest
+  - pytest-cov
+```
 
 ### Setting up Jupyter kernels for the environments
 
